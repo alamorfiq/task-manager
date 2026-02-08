@@ -45,3 +45,6 @@ logs/
 tmp/
 temp/
 
+config/local.yaml
+config/*.local.*
+
