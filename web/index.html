@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #020024;
+            background: linear-gradient(90deg,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 13%, rgba(234, 163, 255, 1) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .add-task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        input, textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+
+        .task-description {
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-date {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.done {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+
+            .task-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Task Manager</h1>
+            <p>Управляй своими задачами легко и удобно</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Всего задач</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeTasks">0</div>
+                <div class="stat-label">Активных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Выполнено</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #1f2937;">Добавить задачу</h2>
+            <div id="errorMessage"></div>
+            <form class="add-task-form" id="addTaskForm">
+                <div class="input-group">
+                    <label for="title">Название задачи *</label>
+                    <input type="text" id="title" placeholder="Например: Купить продукты" required>
+                </div>
+                <div class="input-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description" placeholder="Дополнительная информация о задаче"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Создать задачу</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #1f2937;">Список задач</h2>
+            <div id="tasksList" class="tasks-list">
+                <div class="loading">Загрузка задач...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация API
+        const API_URL = 'http://localhost:8082/api/v1';
+
+        // Элементы DOM
+        const addTaskForm = document.getElementById('addTaskForm');
+        const tasksList = document.getElementById('tasksList');
+        const errorMessage = document.getElementById('errorMessage');
+        const totalTasksEl = document.getElementById('totalTasks');
+        const activeTasksEl = document.getElementById('activeTasks');
+        const completedTasksEl = document.getElementById('completedTasks');
+
+        // Загрузка задач при старте
+        loadTasks();
+
+        // Обработка формы добавления задачи
+        addTaskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (!title) {
+                showError('Название задачи обязательно!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, description }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Очистить форму
+                    document.getElementById('title').value = '';
+                    document.getElementById('description').value = '';
+                    clearError();
+                    
+                    // Перезагрузить список задач
+                    loadTasks();
+                } else {
+                    showError(data.error || 'Ошибка при создании задачи');
+                }
+            } catch (error) {
+                showError('Не удалось подключиться к серверу. Убедитесь, что он запущен.');
+                console.error('Error:', error);
+            }
+        });
+
+        // Загрузка списка задач
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_URL}/tasks`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const tasks = data.data.tasks || [];
+                    renderTasks(tasks);
+                    updateStats(tasks);
+                } else {
+                    showError(data.error || 'Ошибка при загрузке задач');
+                }
+            } catch (error) {
+                tasksList.innerHTML = `
+                    <div class="error">
+                        Не удалось загрузить задачи. Проверьте, что сервер запущен на ${API_URL}
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        }
+
+        // Отображение задач
+        function renderTasks(tasks) {
+            if (tasks.length === 0) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
+                        </svg>
+                        <h3>Нет задач</h3>
+                        <p>Создайте свою первую задачу выше!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.is_done ? 'completed' : ''}">
+                    <div class="task-header">
+                        <div class="task-title">${escapeHtml(task.title)}</div>
+                        <span class="status-badge ${task.is_done ? 'done' : 'pending'}">
+                            ${task.is_done ? 'Выполнено' : 'В работе'}
+                        </span>
+                    </div>
+                    ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+                    <div class="task-footer">
+                        <div class="task-date">
+                            Создано: ${formatDate(task.created_at)}
+                        </div>
+                        <div class="task-actions">
+                            ${!task.is_done ? `
+                                <button class="btn btn-success" onclick="markTaskDone(${task.id})">
+                                    ✓ Выполнено
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-danger" onclick="deleteTask(${task.id})">
+                                🗑 Удалить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Обновление статистики
+        function updateStats(tasks) {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.is_done).length;
+            const active = total - completed;
+
+            totalTasksEl.textContent = total;
+            activeTasksEl.textContent = active;
+            completedTasksEl.textContent = completed;
+        }
+
+        // Отметить задачу выполненной
+        async function markTaskDone(id) {
+            try {
+                const response = await fetch(`${API_URL}/tasks/${id}/done`, {
+                    method: 'PATCH',
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadTasks();
+                } else {
+                    alert('Ошибка: ' + (data.error || 'Не удалось обновить задачу'));
+                }
+            } catch (error) {
+                alert('Не удалось подключиться к серверу');
+                console.error('Error:', error);
+            }
+        }
+
+        // Удалить задачу
+        async function deleteTask(id) {
+            if (!confirm('Вы уверены что хотите удалить эту задачу?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/tasks/${id}`, {
+                    method: 'DELETE',
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadTasks();
+                } else {
+                    alert('Ошибка: ' + (data.error || 'Не удалось удалить задачу'));
+                }
+            } catch (error) {
+                alert('Не удалось подключиться к серверу');
+                console.error('Error:', error);
+            }
+        }
+
+        // Показать ошибку
+        function showError(message) {
+            errorMessage.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(clearError, 5000);
+        }
+
+        // Очистить ошибку
+        function clearError() {
+            errorMessage.innerHTML = '';
+        }
+
+        // Форматирование даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Экранирование HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+
